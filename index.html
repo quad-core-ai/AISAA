@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Intellectus - Your AI Analytics Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #05080f;
+      --surface: #0d1221;
+      --surface2: #131929;
+      --border: rgba(255,255,255,0.07);
+      --accent: #4f8ef7;
+      --accent2: #7c5cfc;
+      --accent3: #00e5c0;
+      --text: #e8edf8;
+      --muted: #7a8aaa;
+      --heading: 'Syne', sans-serif;
+      --body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 600px; height: 600px; background: rgba(79,142,247,0.12); top: -200px; left: -200px; }
+    .orb-2 { width: 500px; height: 500px; background: rgba(124,92,252,0.1); bottom: 100px; right: -100px; animation-delay: -6s; }
+    .orb-3 { width: 350px; height: 350px; background: rgba(0,229,192,0.07); top: 50%; left: 40%; animation-delay: -3s; }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.05); }
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 48px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(5,8,15,0.7);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--heading);
+      font-size: 1.35rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links { display: flex; align-items: center; gap: 12px; }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff !important;
+      padding: 9px 22px !important;
+      border-radius: 10px !important;
+      font-weight: 600 !important;
+      font-size: 0.88rem !important;
+      transition: opacity 0.2s, transform 0.2s !important;
+      box-shadow: 0 0 24px rgba(79,142,247,0.3);
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px) !important; background: rgba(255,255,255,0) !important; }
+
+    /* ── SECTIONS ── */
+    section { position: relative; z-index: 1; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(79,142,247,0.1);
+      border: 1px solid rgba(79,142,247,0.25);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-family: var(--heading);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      max-width: 800px;
+      margin-bottom: 10px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-family: var(--heading);
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 20px;
+      animation: fadeUp 0.7s 0.15s ease both;
+    }
+
+    .hero p {
+      max-width: 540px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 40px;
+      font-weight: 300;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .cta-main {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 8px 32px rgba(79,142,247,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-main:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(79,142,247,0.45); }
+
+    .cta-sec {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    .cta-sec:hover { background: rgba(255,255,255,0.09); }
+
+    .hero-trust {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      animation: fadeUp 0.7s 0.4s ease both;
+    }
+
+    .avatars { display: flex; }
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--heading);
+      font-weight: 700;
+      font-size: 0.78rem;
+      margin-left: -10px;
+    }
+    .avatar:first-child { margin-left: 0; }
+    .av1 { background: linear-gradient(135deg, #4f8ef7, #7c5cfc); }
+    .av2 { background: linear-gradient(135deg, #f76b4f, #f7c44f); }
+    .av3 { background: linear-gradient(135deg, #00e5c0, #4f8ef7); }
+    .av4 { background: linear-gradient(135deg, #fc5c7d, #7c5cfc); }
+
+    /* ── DASHBOARD PREVIEW ── */
+    .dashboard-preview {
+      margin-top: 64px;
+      position: relative;
+      max-width: 900px;
+      width: 100%;
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+
+    .dashboard-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 60px rgba(79,142,247,0.08);
+      overflow: hidden;
+    }
+
+    .dash-topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .dash-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dash-dot:nth-child(1) { background: #ff5f57; }
+    .dash-dot:nth-child(2) { background: #febc2e; }
+    .dash-dot:nth-child(3) { background: #28c840; }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .dash-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .dash-card .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .dash-card .value { font-family: var(--heading); font-size: 1.6rem; font-weight: 700; }
+    .dash-card .change { font-size: 0.75rem; margin-top: 4px; color: var(--accent3); }
+
+    .chart-area {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      height: 160px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .bar {
+      flex: 1;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      opacity: 0.7;
+      animation: barGrow 1s ease both;
+    }
+
+    @keyframes barGrow {
+      from { height: 0 !important; }
+    }
+
+    /* ── STATS ── */
+    .stats-strip {
+      padding: 60px 24px;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 24px;
+      border-right: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.6s ease both;
+    }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-item .num {
+      font-family: var(--heading);
+      font-size: 2.4rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-item .desc { color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
+
+    /* ── FEATURES ── */
+    .features {
+      padding: 100px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--heading);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 60px;
+      font-size: 1rem;
+      font-weight: 300;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(79,142,247,0.05), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover { border-color: rgba(79,142,247,0.3); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-family: var(--heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .feature-card p { color: var(--muted); font-size: 0.9rem; font-weight: 300; line-height: 1.65; }
+
+    .ic1 { background: rgba(79,142,247,0.12); }
+    .ic2 { background: rgba(124,92,252,0.12); }
+    .ic3 { background: rgba(0,229,192,0.12); }
+    .ic4 { background: rgba(247,107,79,0.12); }
+    .ic5 { background: rgba(247,196,79,0.12); }
+    .ic6 { background: rgba(79,142,247,0.12); }
+
+    /* ── WHY SECTION ── */
+    .why {
+      padding: 100px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .why-list {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .why-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 26px;
+      transition: border-color 0.3s;
+    }
+    .why-item:hover { border-color: rgba(0,229,192,0.25); }
+
+    .why-check {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(0,229,192,0.15);
+      border: 1px solid rgba(0,229,192,0.3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: 0.8rem;
+      color: var(--accent3);
+    }
+
+    .why-text h4 { font-family: var(--heading); font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .why-text p { color: var(--muted); font-size: 0.88rem; font-weight: 300; }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 100px 24px;
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 700px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(79,142,247,0.08), rgba(124,92,252,0.08));
+      border: 1px solid rgba(79,142,247,0.2);
+      border-radius: 24px;
+      padding: 64px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%;
+      transform: translateX(-50%);
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(79,142,247,0.15), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-box h2 {
+      font-family: var(--heading);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .cta-box p { color: var(--muted); font-size: 1rem; max-width: 440px; margin: 0 auto 36px; font-weight: 300; }
+
+    .cta-box .guarantee {
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .cta-box .guarantee span { color: var(--accent3); }
+
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    footer p { color: var(--muted); font-size: 0.82rem; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .dash-grid { grid-template-columns: 1fr 1fr; }
+      .stats-strip { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+      .cta-box { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BG ORBS -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="#" class="nav-logo">✦ Intellectus</a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#why">Why Us</a>
+      <a href="#" class="btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge"><span class="dot"></span> AI-Powered Education Analytics</div>
+
+    <h1>Too much data.<br><span class="highlight">Too little time.</span></h1>
+    <div class="hero-sub">We've got you covered.</div>
+    <p>AI & algorithm powered analytics to help educators visualize and predict student performance — and make data-driven decisions faster than ever.</p>
+
+    <div class="hero-cta">
+      <a href="#" class="cta-main">Start Free Trial →</a>
+      <a href="#" class="cta-sec">Sign In</a>
+    </div>
+
+    <div class="hero-trust">
+      <div class="avatars">
+        <div class="avatar av1">J</div>
+        <div class="avatar av2">S</div>
+        <div class="avatar av3">M</div>
+        <div class="avatar av4">K</div>
+      </div>
+      <span>500+ educators trust us</span>
+    </div>
+
+    <!-- DASHBOARD PREVIEW -->
+    <div class="dashboard-preview">
+      <div class="dashboard-frame">
+        <div class="dash-topbar">
+          <div class="dash-dot"></div>
+          <div class="dash-dot"></div>
+          <div class="dash-dot"></div>
+        </div>
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="label">Avg Score</div>
+            <div class="value" style="background:linear-gradient(90deg,#4f8ef7,#7c5cfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">84.2%</div>
+            <div class="change">↑ 12% this month</div>
+          </div>
+          <div class="dash-card">
+            <div class="label">At-Risk Students</div>
+            <div class="value" style="background:linear-gradient(90deg,#f76b4f,#f7c44f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">7</div>
+            <div class="change" style="color:#f76b4f;">Needs attention</div>
+          </div>
+          <div class="dash-card">
+            <div class="label">Classes Tracked</div>
+            <div class="value" style="background:linear-gradient(90deg,#00e5c0,#4f8ef7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">14</div>
+            <div class="change">All up to date</div>
+          </div>
+        </div>
+        <div class="chart-area">
+          <div class="bar" style="height:55%;animation-delay:0.1s"></div>
+          <div class="bar" style="height:70%;animation-delay:0.15s"></div>
+          <div class="bar" style="height:48%;animation-delay:0.2s"></div>
+          <div class="bar" style="height:85%;animation-delay:0.25s;opacity:1;background:linear-gradient(180deg,var(--accent3),var(--accent))"></div>
+          <div class="bar" style="height:60%;animation-delay:0.3s"></div>
+          <div class="bar" style="height:75%;animation-delay:0.35s"></div>
+          <div class="bar" style="height:90%;animation-delay:0.4s;opacity:1;background:linear-gradient(180deg,var(--accent3),var(--accent))"></div>
+          <div class="bar" style="height:65%;animation-delay:0.45s"></div>
+          <div class="bar" style="height:80%;animation-delay:0.5s"></div>
+          <div class="bar" style="height:55%;animation-delay:0.55s"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-item animate-on-scroll" style="animation-delay:0s">
+      <div class="num">87%</div>
+      <div class="desc">Improvement in insights</div>
+    </div>
+    <div class="stat-item animate-on-scroll" style="animation-delay:0.1s">
+      <div class="num">10k+</div>
+      <div class="desc">Students analyzed</div>
+    </div>
+    <div class="stat-item animate-on-scroll" style="animation-delay:0.2s">
+      <div class="num">5hrs</div>
+      <div class="desc">Saved per week</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-label">Everything You Need</div>
+    <h2 class="section-title">Tools Built for Modern Educators</h2>
+    <p class="section-sub">Comprehensive features designed to give you complete insight into every student's journey.</p>
+
+    <div class="features-grid">
+      <div class="feature-card animate-on-scroll">
+        <div class="feature-icon ic1">📊</div>
+        <h3>Advanced Analytics</h3>
+        <p>Visualize student performance with interactive charts and gain actionable insights that drive real improvement.</p>
+      </div>
+      <div class="feature-card animate-on-scroll" style="transition-delay:0.05s">
+        <div class="feature-icon ic2">🤖</div>
+        <h3>AI Assistant</h3>
+        <p>Get intelligent answers about your data with our conversational AI — just ask in plain English.</p>
+      </div>
+      <div class="feature-card animate-on-scroll" style="transition-delay:0.1s">
+        <div class="feature-icon ic3">🔮</div>
+        <h3>Proactive Insights</h3>
+        <p>Identify student groups and trends with predictive analytics before problems become crises.</p>
+      </div>
+      <div class="feature-card animate-on-scroll" style="transition-delay:0.15s">
+        <div class="feature-icon ic4">🏫</div>
+        <h3>Class Management</h3>
+        <p>Organize and track multiple classes, students, and assessments all from one unified dashboard.</p>
+      </div>
+      <div class="feature-card animate-on-scroll" style="transition-delay:0.2s">
+        <div class="feature-icon ic5">🏷️</div>
+        <h3>Smart Classification</h3>
+        <p>Automatic test, question, and topic identification to surface the right insights instantly.</p>
+      </div>
+      <div class="feature-card animate-on-scroll" style="transition-delay:0.25s">
+        <div class="feature-icon ic6">📥</div>
+        <h3>Easy Data Entry</h3>
+        <p>Import quizzes, lab results, and attendance data seamlessly — no manual copy-pasting required.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="why" id="why">
+    <div class="section-label">Why Intellectus</div>
+    <h2 class="section-title">Why Educators Choose Us</h2>
+    <p class="section-sub">Built by teachers, for teachers — with the things that actually matter.</p>
+
+    <div class="why-list">
+      <div class="why-item animate-on-scroll">
+        <div class="why-check">✓</div>
+        <div class="why-text">
+          <h4>Save Hours Every Week</h4>
+          <p>Stop spending hours crunching numbers manually. Intellectus automates data analysis so you can focus on teaching.</p>
+        </div>
+      </div>
+      <div class="why-item animate-on-scroll">
+        <div class="why-check">✓</div>
+        <div class="why-text">
+          <h4>Identify At-Risk Students Early</h4>
+          <p>Our predictive models flag struggling students weeks before their grades slip, giving you time to intervene.</p>
+        </div>
+      </div>
+      <div class="why-item animate-on-scroll">
+        <div class="why-check">✓</div>
+        <div class="why-text">
+          <h4>Beautiful Visualizations in One Click</h4>
+          <p>Generate stunning performance charts and shareable reports without needing a data science background.</p>
+        </div>
+      </div>
+      <div class="why-item animate-on-scroll">
+        <div class="why-check">✓</div>
+        <div class="why-text">
+          <h4>Seamless Integrations</h4>
+          <p>Works with your existing spreadsheets, LMS exports, and grading tools — zero disruption to your workflow.</p>
+        </div>
+      </div>
+      <div class="why-item animate-on-scroll">
+        <div class="why-check">✓</div>
+        <div class="why-text">
+          <h4>Personal AI for Every Question</h4>
+          <p>Ask anything about your data in natural language and get instant, accurate answers powered by AI.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section">
+    <div class="cta-box animate-on-scroll">
+      <h2>Ready to Transform Your Teaching?</h2>
+      <p>Join hundreds of educators using Intellectus to make smarter, faster, data-driven decisions.</p>
+      <div class="cta-btns">
+        <a href="#" class="cta-main">Get Started Free →</a>
+        <a href="#" class="cta-sec">Sign In</a>
+      </div>
+      <p class="guarantee">Not convinced? No worries — <span>30-day 100% money-back guarantee.</span></p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="#" class="nav-logo">✦ Intellectus</a>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+    <p>© 2025 Intellectus. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Scroll animation observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // Stagger stat items
+    document.querySelectorAll('.stat-item').forEach((el, i) => {
+      el.style.transitionDelay = (i * 0.1) + 's';
+    });
+  </script>
+
+</body>
+</html>
