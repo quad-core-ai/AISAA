@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AISAA — Academic Intelligence Platform by QuadCore</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#07182e;--navy2:#0b2240;--navy3:#0f2e56;
+  --blue:#1755c8;--blue2:#2268e8;--blue3:#4a87f5;
+  --gold:#b8841e;--gold2:#d9a832;--gold3:#f0c354;
+  --cream:#f7f5f0;--white:#ffffff;
+  --text:#0e1c2f;--muted:#526070;--border:#dde5f0;
+  --heading:'DM Serif Display',serif;--body:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--cream);color:var(--text);overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cur{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--gold2);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .15s,width .2s,height .2s;mix-blend-mode:difference}
+#cur-ring{position:fixed;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(209,168,50,.45);pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:left .1s ease,top .1s ease,width .25s,height .25s,opacity .2s}
+.hoverable:hover~#cur,a:hover~#cur,button:hover~#cur{transform:translate(-50%,-50%) scale(2.4)}
+
+/* SCROLL BAR */
+#sb{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold2));width:0%;z-index:9999;border-radius:0 2px 2px 0;transition:width .08s linear}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9000;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .9s ease,transform .9s cubic-bezier(.76,0,.24,1)}
+#splash.out{opacity:0;transform:translateY(-100%);pointer-events:none}
+.sp-logo{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--navy2),var(--blue));border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-size:1.6rem;color:#fff;overflow:hidden;animation:spUp .6s .2s both}
+.sp-logo img{width:100%;height:100%;object-fit:contain;border-radius:18px}
+.sp-title{font-family:var(--heading);font-size:3rem;color:#fff;animation:spUp .6s .35s both}
+.sp-title b{color:var(--gold3)}
+.sp-sub{font-size:.78rem;color:rgba(255,255,255,.38);letter-spacing:.18em;text-transform:uppercase;animation:spUp .6s .5s both}
+.sp-line{width:160px;height:2px;background:rgba(255,255,255,.08);border-radius:99px;margin-top:6px;animation:spUp .6s .6s both;overflow:hidden}
+.sp-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--gold3));animation:spBar 1.8s .7s ease both}
+@keyframes spUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spBar{from{width:0}to{width:100%}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(7,24,46,.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);transform:translateY(-100%);transition:transform .6s cubic-bezier(.76,0,.24,1)}
+nav.show{transform:translateY(0)}
+.n-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.n-logo-box{height:36px;width:36px;border-radius:10px;background:linear-gradient(135deg,var(--navy2),var(--blue));border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.n-logo-box img{width:100%;height:100%;object-fit:contain}
+.n-logo-text{font-family:var(--heading);font-size:1.15rem;color:#fff}
+.n-logo-text b{color:var(--gold3)}
+.n-logo-sub{font-size:.6rem;color:rgba(255,255,255,.35);font-weight:500;display:block;margin-top:-1px}
+.n-links{display:flex;gap:2px}
+.n-links a{text-decoration:none;color:rgba(255,255,255,.55);font-size:.8rem;font-weight:500;padding:6px 11px;border-radius:7px;transition:color .2s,background .2s;white-space:nowrap}
+.n-links a:hover{color:#fff;background:rgba(255,255,255,.07)}
+.n-demo{text-decoration:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-size:.82rem;font-weight:700;padding:9px 20px;border-radius:8px;transition:opacity .2s,transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(184,132,30,.3)}
+.n-demo:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 8px 24px rgba(184,132,30,.45)}
+
+/* QUOTE STRIP */
+.qs{background:var(--navy);padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07);margin-top:68px;position:relative;z-index:1}
+.qs-inner{max-width:820px;margin:0 auto;padding:0 24px;text-align:center}
+#qt{font-family:var(--heading);font-size:.95rem;font-style:italic;color:rgba(255,255,255,.72)}
+.qt-cur{display:inline-block;width:2px;height:.9em;background:var(--gold3);animation:blink .7s infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:110px 24px 80px;position:relative;background:linear-gradient(175deg,var(--navy) 0%,var(--navy2) 55%,var(--navy3) 100%);overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-image:radial-gradient(ellipse at 15% 55%,rgba(34,104,232,.14) 0%,transparent 55%),radial-gradient(ellipse at 85% 15%,rgba(184,132,30,.09) 0%,transparent 48%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:64px 64px;pointer-events:none}
+.h-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:7px 18px;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.8);letter-spacing:.07em;text-transform:uppercase;margin-bottom:26px;position:relative;z-index:1;animation:fadeUp .6s both}
+.h-dot{width:7px;height:7px;border-radius:50%;background:var(--gold3);animation:blink 2s infinite}
+.hero h1{font-family:var(--heading);font-size:clamp(2.6rem,5.5vw,4.8rem);line-height:1.06;letter-spacing:-.3px;color:#fff;max-width:860px;margin-bottom:18px;position:relative;z-index:1;animation:fadeUp .7s .1s both}
+.hero h1 em{font-style:italic;color:var(--gold3)}
+.hero-sub{font-size:.95rem;color:rgba(255,255,255,.5);max-width:540px;line-height:1.8;margin-bottom:38px;position:relative;z-index:1;animation:fadeUp .7s .2s both;font-style:italic}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:64px;position:relative;z-index:1;animation:fadeUp .7s .3s both}
+.btn-gold{text-decoration:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);padding:13px 32px;border-radius:9px;font-weight:700;font-size:.93rem;box-shadow:0 6px 24px rgba(184,132,30,.35);transition:transform .2s,box-shadow .2s}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(184,132,30,.45)}
+.btn-outline{text-decoration:none;background:rgba(255,255,255,.07);color:#fff;padding:13px 32px;border-radius:9px;font-weight:500;font-size:.93rem;border:1.5px solid rgba(255,255,255,.18);transition:border-color .2s,background .2s,transform .2s}
+.btn-outline:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.11);transform:translateY(-2px)}
+
+/* DASHBOARD SCROLL SHOWCASE */
+.hero-dash-wrap{width:100%;max-width:1020px;position:relative;z-index:1;animation:fadeUp .9s .4s both}
+.dash-frame{background:var(--navy2);border-radius:18px;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 100px rgba(0,0,0,.55);overflow:hidden}
+.dash-bar{background:var(--navy);padding:13px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.dbts{display:flex;gap:5px}
+.dbt{width:11px;height:11px;border-radius:50%}
+.dbt1{background:#ff5f57}.dbt2{background:#febc2e}.dbt3{background:#28c840}
+.durl{flex:1;background:rgba(255,255,255,.07);height:26px;border-radius:5px;display:flex;align-items:center;padding:0 12px;font-size:.72rem;color:rgba(255,255,255,.3);font-family:monospace}
+.dash-tabs{background:rgba(7,24,46,.8);padding:0 20px;display:flex;align-items:center;gap:0;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;scrollbar-width:none}
+.dash-tabs::-webkit-scrollbar{display:none}
+.dt{padding:11px 18px;font-size:.73rem;font-weight:500;color:rgba(255,255,255,.38);border-bottom:2px solid transparent;transition:color .25s,border-color .25s;white-space:nowrap;cursor:pointer}
+.dt.on{color:#fff;border-color:var(--gold2)}
+.dash-scroll-area{position:relative;overflow:hidden}
+.dash-slides{display:flex;transition:transform .6s cubic-bezier(.76,0,.24,1)}
+.dash-slide{min-width:100%;padding:22px}
+/* Slide content grids */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--cream);border:1px solid var(--border);border-radius:11px;padding:14px 16px;transition:transform .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(7,24,46,.1)}
+.kpi-l{font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:5px}
+.kpi-v{font-family:var(--heading);font-size:1.7rem;color:var(--navy);line-height:1}
+.kpi-s{font-size:.66rem;margin-top:4px;font-weight:600}
+.sg{color:#16a34a}.sr{color:#dc2626}.sb2{color:var(--blue2)}.sa{color:var(--gold)}
+.slide-grid{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:12px}
+.sg-block{background:var(--cream);border:1px solid var(--border);border-radius:11px;padding:15px}
+.sg-title{font-size:.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:68px}
+.bar{flex:1;border-radius:3px 3px 0 0}
+.bh{background:linear-gradient(180deg,var(--blue2),var(--navy))}
+.bm{background:var(--blue3);opacity:.55}
+.bl{background:var(--blue3);opacity:.22}
+.mrp-block{background:var(--navy);border-radius:11px;padding:15px}
+.mrp-t{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:10px}
+.mrp-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mrp-item:last-child{margin-bottom:0}
+.mrp-nm{font-size:.72rem;color:rgba(255,255,255,.8)}
+.mrp-bar{width:70px;height:5px;background:rgba(255,255,255,.1);border-radius:99px}
+.mrp-fill{height:100%;border-radius:99px}
+.mh{background:#ef4444}.mm{background:#f59e0b}.ml{background:#22c55e}
+.alerts-block{background:#fffbf0;border:1px solid #f5d87a;border-radius:11px;padding:14px}
+.al-t{font-size:.64rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.al-i{display:flex;align-items:flex-start;gap:7px;font-size:.7rem;color:var(--text);margin-bottom:6px;line-height:1.5}
+.al-i:last-child{margin-bottom:0}
+.al-d{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.dash-nav-dots{display:flex;justify-content:center;align-items:center;gap:8px;padding:14px 0 16px;background:var(--navy2)}
+.dnd{width:28px;height:3px;border-radius:99px;background:rgba(255,255,255,.15);cursor:pointer;transition:background .25s,width .25s}
+.dnd.on{background:var(--gold2);width:40px}
+/* placeholder slide */
+.ph-slide{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;gap:10px;opacity:.4}
+.ph-slide p{font-size:.82rem;color:rgba(255,255,255,.6);font-style:italic}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* TRUST */
+.trust{background:var(--navy2);padding:30px 24px;border-bottom:1px solid rgba(255,255,255,.06)}
+.trust-in{max-width:1000px;margin:0 auto;text-align:center}
+.trust p{font-size:.68rem;color:rgba(255,255,255,.28);letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:16px}
+.trust-row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.trust-i{font-family:var(--heading);font-size:.9rem;color:rgba(255,255,255,.18)}
+
+/* SECTION COMMONS */
+.sec{padding:96px 24px;position:relative;z-index:1}
+.sec-in{max-width:1120px;margin:0 auto}
+.pill{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+.pd{background:var(--navy);border:1px solid rgba(255,255,255,.1);color:var(--gold3)}
+.pl{background:rgba(23,85,200,.1);border:1px solid rgba(23,85,200,.15);color:var(--blue2)}
+.sh{font-family:var(--heading);font-size:clamp(1.9rem,4vw,3rem);letter-spacing:-.4px;line-height:1.1;margin-bottom:14px}
+.sw{color:#fff}.sd{color:var(--navy)}
+.sp2{color:var(--muted);font-size:.97rem;max-width:520px;line-height:1.75}
+.spw{color:rgba(255,255,255,.52)}
+/* animations */
+.anim{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.anim.vis{opacity:1;transform:translateY(0)}
+.s3d{opacity:0;transform:perspective(700px) rotateX(20deg) translateY(22px);transition:opacity .75s ease,transform .75s ease}
+.s3d.vis{opacity:1;transform:perspective(700px) rotateX(0deg) translateY(0)}
+.slide-in-l{opacity:0;transform:translateX(-32px);transition:opacity .7s ease,transform .7s ease}
+.slide-in-l.vis{opacity:1;transform:translateX(0)}
+.slide-in-r{opacity:0;transform:translateX(32px);transition:opacity .7s ease,transform .7s ease}
+.slide-in-r.vis{opacity:1;transform:translateX(0)}
+
+/* HOW IT WORKS */
+.how-sec{background:var(--navy)}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:60px;position:relative}
+.how-grid::before{content:'';position:absolute;top:32px;left:12%;right:12%;height:1px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.1) 0,rgba(255,255,255,.1) 8px,transparent 8px,transparent 16px)}
+.how-card{text-align:center;padding:0 24px}
+.how-num{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-size:1.2rem;color:#fff;margin:0 auto 22px;position:relative;z-index:2;transition:background .3s,border-color .3s,transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s}
+.how-card:hover .how-num{background:var(--blue2);border-color:var(--blue2);transform:scale(1.15) translateY(-4px);box-shadow:0 12px 32px rgba(34,104,232,.45)}
+.how-card h3{font-family:var(--heading);font-size:1.05rem;color:#fff;margin-bottom:10px}
+.how-card p{color:rgba(255,255,255,.48);font-size:.84rem;line-height:1.72}
+
+/* STAKEHOLDERS */
+.stake-sec{background:var(--cream)}
+.stake-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px}
+.stake-card{border-radius:18px;overflow:hidden;border:1px solid var(--border);transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .35s}
+.stake-card:hover{transform:translateY(-10px) scale(1.01);box-shadow:0 32px 80px rgba(7,24,46,.14)}
+.stake-top{padding:32px 26px 22px}
+.st-n{background:var(--navy)}.st-b{background:var(--blue2)}.st-t{background:linear-gradient(135deg,#0a4a5e,#0d7a9e)}.st-p{background:linear-gradient(135deg,#3a1a6e,#6d3ab5)}.st-g{background:linear-gradient(135deg,#7a530e,var(--gold))}
+.stake-role{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:10px}
+.stake-top h3{font-family:var(--heading);font-size:1.25rem;color:#fff;margin-bottom:10px}
+.stake-top p{color:rgba(255,255,255,.62);font-size:.84rem;line-height:1.65}
+.stake-features{background:#fff;padding:22px 26px}
+.sf-i{display:flex;align-items:flex-start;gap:9px;font-size:.83rem;color:var(--text);padding:7px 0;border-bottom:1px solid var(--border);line-height:1.5}
+.sf-i:last-child{border-bottom:none}
+.sf-a{color:var(--blue2);font-weight:700;flex-shrink:0;margin-top:1px;font-size:.78rem}
+
+/* FEATURES — INTERACTIVE */
+.feat-sec{background:var(--navy2)}
+.feat-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:48px;margin-bottom:32px}
+.ft-btn{padding:10px 22px;border-radius:100px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-family:var(--body);font-size:.82rem;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;transition:all .25s;white-space:nowrap}
+.ft-btn:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.85)}
+.ft-btn.on{background:rgba(255,255,255,.1);border-color:var(--gold2);color:#fff;box-shadow:0 0 0 4px rgba(240,195,84,.08)}
+.feat-panel{display:none;animation:panelIn .4s ease both}
+.feat-panel.on{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fp-text h3{font-family:var(--heading);font-size:1.8rem;color:#fff;letter-spacing:-.4px;line-height:1.15;margin-bottom:14px}
+.fp-text p{color:rgba(255,255,255,.55);font-size:.92rem;line-height:1.82;margin-bottom:20px}
+.fp-points{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.fp-pt{display:flex;align-items:flex-start;gap:10px;font-size:.86rem;color:rgba(255,255,255,.75);line-height:1.55}
+.fp-pt-dot{width:7px;height:7px;border-radius:50%;background:var(--gold3);flex-shrink:0;margin-top:5px}
+.fp-tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:100px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1)}
+.fp-visual{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px;min-height:280px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.fp-visual::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(34,104,232,.12),transparent 70%);pointer-events:none}
+.fv-row{display:flex;gap:10px}
+.fv-pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 14px;flex:1;transition:transform .2s,background .2s}
+.fv-pill:hover{background:rgba(255,255,255,.11);transform:translateY(-2px)}
+.fv-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.38);font-weight:600;margin-bottom:4px}
+.fv-val{font-family:var(--heading);font-size:1.3rem;color:#fff}
+.fv-sub{font-size:.65rem;font-weight:600;margin-top:3px}
+.fv-bar-row{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:12px 14px}
+.fv-br-label{font-size:.63rem;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.35);font-weight:600;margin-bottom:8px}
+.fv-br-item{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fv-br-item:last-child{margin-bottom:0}
+.fv-br-name{font-size:.7rem;color:rgba(255,255,255,.65);width:72px;flex-shrink:0}
+.fv-br-track{flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:99px}
+.fv-br-fill{height:100%;border-radius:99px}
+.fv-alert{background:rgba(240,195,84,.08);border:1px solid rgba(240,195,84,.2);border-radius:8px;padding:11px 14px}
+.fv-alert-t{font-size:.64rem;font-weight:700;color:var(--gold3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.fv-alert-i{font-size:.72rem;color:rgba(255,255,255,.65);display:flex;gap:7px;align-items:flex-start;margin-bottom:5px;line-height:1.45}
+.fv-alert-i:last-child{margin-bottom:0}
+.fv-alert-d{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.fv-schedule{background:rgba(34,104,232,.08);border:1px solid rgba(34,104,232,.2);border-radius:8px;padding:12px 14px}
+.fv-sch-t{font-size:.64rem;font-weight:700;color:var(--blue3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.fv-sch-item{display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:rgba(255,255,255,.65);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.fv-sch-item:last-child{border-bottom:none}
+.fv-badge{font-size:.62rem;padding:2px 8px;border-radius:100px;font-weight:600}
+.fv-done{background:rgba(34,197,94,.15);color:#22c55e}
+.fv-pend{background:rgba(245,158,11,.15);color:#f59e0b}
+
+/* TEAM */
+.team-sec{background:var(--white)}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px}
+.tc{border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .35s}
+.tc:hover{transform:translateY(-8px) scale(1.01);box-shadow:0 28px 70px rgba(7,24,46,.1)}
+.tc-top{padding:28px 24px 22px;background:linear-gradient(135deg,var(--navy),var(--navy3));position:relative;overflow:hidden}
+.tc-top::before{content:'';position:absolute;top:-50px;right:-50px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.04)}
+.tc-photo{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-size:1.4rem;color:#fff;margin-bottom:14px;overflow:hidden;position:relative;z-index:1}
+.tc-photo img{width:100%;height:100%;object-fit:cover}
+.tc-name{font-family:var(--heading);font-size:1.1rem;color:#fff;margin-bottom:4px;position:relative;z-index:1}
+.tc-role{font-size:.7rem;font-weight:600;color:var(--gold3);letter-spacing:.06em;text-transform:uppercase;position:relative;z-index:1}
+.tc-bot{padding:18px 24px;background:var(--cream)}
+.tc-resp{font-size:.82rem;color:var(--muted);line-height:1.72}
+.tc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tc-tag{font-size:.66rem;font-weight:600;background:rgba(23,85,200,.08);color:var(--blue2);border:1px solid rgba(23,85,200,.15);padding:3px 9px;border-radius:100px}
+
+/* REVIEWS */
+.reviews-sec{background:var(--cream)}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px}
+.rv{background:#fff;border:1px solid var(--border);border-radius:18px;padding:30px;position:relative;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s}
+.rv:hover{transform:translateY(-7px);box-shadow:0 22px 60px rgba(7,24,46,.1)}
+.rv::before{content:'\201C';position:absolute;top:18px;right:22px;font-family:var(--heading);font-size:4rem;color:var(--border);line-height:1}
+.rv-stars{display:flex;gap:3px;margin-bottom:14px}
+.rv-star{color:var(--gold2);font-size:.88rem}
+.rv-placeholder{background:var(--cream);border-radius:8px;height:12px;margin-bottom:8px;opacity:.5}
+.rv-placeholder.short{width:60%}
+.rv-placeholder.medium{width:80%}
+.rv-placeholder.full{width:100%}
+.rv-author{display:flex;align-items:center;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.rv-avatar{width:42px;height:42px;border-radius:50%;background:var(--border);flex-shrink:0}
+.rv-name-ph{height:11px;background:var(--border);border-radius:4px;width:80px;margin-bottom:5px;opacity:.6}
+.rv-role-ph{height:9px;background:var(--border);border-radius:4px;width:120px;opacity:.4}
+.rv-coming{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(247,245,240,.92);border-radius:18px;backdrop-filter:blur(4px)}
+.rv-coming-icon{font-size:1.8rem;opacity:.4}
+.rv-coming p{font-size:.78rem;color:var(--muted);font-style:italic}
+
+/* ABOUT */
+.about-sec{background:var(--cream)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:44px}
+.about-visual{position:relative}
+.about-img-wrap{border-radius:20px;overflow:hidden;height:400px}
+.about-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s;filter:brightness(.88)}
+.about-img-wrap:hover img{transform:scale(1.04)}
+.about-badge{position:absolute;bottom:20px;left:20px;background:var(--navy);color:#fff;border-radius:12px;padding:12px 18px;font-family:var(--heading);font-size:.88rem;font-weight:700;border:1px solid rgba(255,255,255,.1)}
+.about-badge b{color:var(--gold3)}
+.about-text-h{font-family:var(--heading);font-size:1.9rem;color:var(--navy);letter-spacing:-.4px;line-height:1.15;margin-bottom:16px}
+.about-p{color:var(--muted);font-size:.9rem;line-height:1.82;margin-bottom:12px}
+.mv-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:36px}
+.mvc{border-radius:16px;padding:26px;overflow:hidden;position:relative}
+.mvc::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)}
+.mvc-m{background:var(--navy)}.mvc-v{background:linear-gradient(135deg,#7a530e,var(--gold))}
+.mvc-i{font-size:1.8rem;margin-bottom:12px}
+.mvc h3{font-family:var(--heading);font-size:1.1rem;color:#fff;margin-bottom:8px}
+.mvc p{font-size:.84rem;color:rgba(255,255,255,.75);line-height:1.7}
+
+/* CONTACT */
+.contact-sec{background:var(--navy2)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:44px;margin-top:52px;align-items:start}
+.contact-cards{display:flex;flex-direction:column;gap:15px}
+.cc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:22px;display:flex;align-items:flex-start;gap:14px;transition:background .25s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.cc:hover{background:rgba(255,255,255,.08);transform:translateY(-3px)}
+.cc-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;background:rgba(255,255,255,.07);flex-shrink:0}
+.cc h4{font-family:var(--heading);font-size:.9rem;color:#fff;margin-bottom:4px}
+.cc p{color:rgba(255,255,255,.5);font-size:.83rem;line-height:1.6}
+.cc a{color:var(--gold3);text-decoration:none}
+.cc a:hover{text-decoration:underline}
+.contact-form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:34px}
+.contact-form h3{font-family:var(--heading);font-size:1.35rem;color:#fff;margin-bottom:6px}
+.contact-form>p{color:rgba(255,255,255,.45);font-size:.85rem;margin-bottom:22px}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:.74rem;font-weight:600;color:rgba(255,255,255,.48);margin-bottom:5px}
+.fi{width:100%;padding:11px 13px;border:1.5px solid rgba(255,255,255,.1);border-radius:9px;font-family:var(--body);font-size:.86rem;color:#fff;background:rgba(255,255,255,.07);outline:none;transition:border-color .2s,background .2s}
+.fi::placeholder{color:rgba(255,255,255,.22)}
+.fi:focus{border-color:rgba(74,135,245,.55);background:rgba(255,255,255,.09)}
+textarea.fi{height:96px;resize:vertical}
+.fsub{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;padding:13px;border-radius:9px;font-family:var(--body);font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .2s,box-shadow .2s;box-shadow:0 6px 20px rgba(23,85,200,.3)}
+.fsub:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 12px 28px rgba(23,85,200,.4)}
+#form-msg{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:.82rem;font-weight:500}
+#form-msg.ok{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25)}
+#form-msg.err{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25)}
+
+/* LEGAL */
+.legal-sec{background:var(--cream)}
+.tab-bar{display:flex;gap:9px;margin-bottom:32px}
+.tb{padding:9px 26px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-family:var(--body);font-size:.84rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .22s}
+.tb:hover{border-color:var(--navy);color:var(--navy);transform:translateY(-1px)}
+.tb.on{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 5px 18px rgba(7,24,46,.18)}
+.tp{display:none}
+.tp.on{display:block}
+.legal-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.lb{background:#fff;border:1px solid var(--border);border-radius:13px;padding:26px;transition:box-shadow .3s,transform .3s}
+.lb:hover{box-shadow:0 8px 30px rgba(7,24,46,.08);transform:translateY(-2px)}
+.lb-head{display:flex;align-items:center;gap:11px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.lb-n{width:30px;height:30px;border-radius:7px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-size:.82rem;color:#fff;flex-shrink:0}
+.lb h3{font-family:var(--heading);font-size:.95rem;color:var(--navy)}
+.lb p{color:var(--muted);font-size:.81rem;line-height:1.8;margin-bottom:7px}
+.lb p:last-child{margin-bottom:0}
+.lb strong{color:var(--navy)}
+.lb a{color:var(--blue2)}
+
+/* CTA BANNER */
+.cta-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%)}
+.cta-in{text-align:center;padding:80px 24px}
+.cta-in h2{font-family:var(--heading);font-size:clamp(1.8rem,4vw,2.8rem);color:#fff;letter-spacing:-.4px;margin-bottom:14px}
+.cta-in p{color:rgba(255,255,255,.52);font-size:.98rem;max-width:460px;margin:0 auto 34px;line-height:1.75}
+.cta-btns{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.06);padding:48px 56px 30px}
+.ft{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:44px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:24px}
+.fb-desc{color:rgba(255,255,255,.32);font-size:.81rem;line-height:1.72;margin-top:11px;max-width:230px}
+.fb-pow{display:inline-flex;align-items:center;gap:6px;margin-top:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:100px;padding:5px 13px;font-size:.72rem;color:rgba(255,255,255,.32);font-weight:500}
+.fb-pow b{color:var(--gold3)}
+.fc2 h4{font-family:var(--heading);font-size:.86rem;color:#fff;margin-bottom:14px}
+.fc2 a{display:block;color:rgba(255,255,255,.32);text-decoration:none;font-size:.8rem;margin-bottom:9px;transition:color .2s}
+.fc2 a:hover{color:rgba(255,255,255,.8)}
+.fb-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.fb-bottom p{color:rgba(255,255,255,.18);font-size:.76rem}
+.fb-logo{font-family:var(--heading);font-size:1.1rem;color:#fff}
+.fb-logo b{color:var(--gold3)}
+
+/* PARTICLES */
+.particle{position:absolute;border-radius:50%;background:rgba(255,255,255,.3);animation:pfloat linear infinite;pointer-events:none}
+@keyframes pfloat{0%{transform:translateY(100vh);opacity:0}10%{opacity:.7}90%{opacity:.15}100%{transform:translateY(-10vh);opacity:0}}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .n-links{display:none}
+  .stake-grid,.team-grid,.reviews-grid{grid-template-columns:1fr 1fr}
+  .how-grid{grid-template-columns:1fr 1fr}.how-grid::before{display:none}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .about-grid,.contact-grid,.mv-row,.feat-panel.on{grid-template-columns:1fr}
+  .ft{grid-template-columns:1fr 1fr}
+  footer{padding:40px 24px 24px}
+  nav{padding:0 20px}
+}
+@media(max-width:620px){
+  .stake-grid,.team-grid,.reviews-grid,.legal-grid{grid-template-columns:1fr}
+  .how-grid{grid-template-columns:1fr}
+  .cta-btns{flex-direction:column;align-items:center}
+  .feat-tabs{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div id="sb"></div>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-logo"><img src="logo.jpeg" alt="AISAA" onerror="this.parentElement.textContent='AI'"/></div>
+  <div class="sp-title">AIS<b>AA</b></div>
+  <div class="sp-sub">Academic Intelligence Platform</div>
+  <div class="sp-line"><div class="sp-fill"></div></div>
+</div>
+
+<!-- QUOTE STRIP -->
+<div class="qs">
+  <div class="qs-inner"><span id="qt"></span><span class="qt-cur"></span></div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="n-logo">
+    <div class="n-logo-box"><img src="logo.jpeg" alt="AISAA" onerror="this.style.display='none'"/></div>
+    <div>
+      <div class="n-logo-text">AIS<b>AA</b></div>
+      <span class="n-logo-sub">Powered by QuadCore</span>
+    </div>
+  </a>
+  <div class="n-links">
+    <a href="#how">How It Works</a>
+    <a href="#stakeholders">Stakeholders</a>
+    <a href="#features">Features</a>
+    <a href="#team">Our Team</a>
+    <a href="#about">About Us</a>
+    <a href="#legal">Privacy &amp; Terms</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#contact" class="n-demo">Request Demo →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div id="ptc"></div>
+  <div class="h-pill"><span class="h-dot"></span>Enterprise Academic Intelligence</div>
+  <h1>Academic Management<br/>Shouldn't Be Manual.<br/><em>AISAA Automates It.</em></h1>
+  <p class="hero-sub">Raw academic data becomes real institutional intelligence — serving every role, end to end.</p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn-gold">Request a Demo →</a>
+    <a href="#stakeholders" class="btn-outline">See Who It Serves</a>
+  </div>
+
+  <!-- DASHBOARD CAROUSEL -->
+  <div class="hero-dash-wrap">
+    <div class="dash-frame">
+      <div class="dash-bar">
+        <div class="dbts"><div class="dbt dbt1"></div><div class="dbt dbt2"></div><div class="dbt dbt3"></div></div>
+        <div class="durl">aisaa.quadcore.ae — Academic Intelligence Platform</div>
+      </div>
+      <div class="dash-tabs" id="dtabs">
+        <div class="dt on" onclick="goslide(0,this)">Head of Department</div>
+        <div class="dt" onclick="goslide(1,this)">Faculty</div>
+        <div class="dt" onclick="goslide(2,this)">Advisor</div>
+        <div class="dt" onclick="goslide(3,this)">ASC Staff</div>
+        <div class="dt" onclick="goslide(4,this)">Student</div>
+        <div class="dt" onclick="goslide(5,this)">System Screenshots</div>
+      </div>
+      <div class="dash-scroll-area">
+        <div class="dash-slides" id="dslides">
+
+          <!-- SLIDE 0: HoD -->
+          <div class="dash-slide">
+            <div class="kpi-row">
+              <div class="kpi"><div class="kpi-l">Total Students</div><div class="kpi-v">342</div><div class="kpi-s sb2">Active this trimester</div></div>
+              <div class="kpi"><div class="kpi-l">MRP — At Risk</div><div class="kpi-v">18</div><div class="kpi-s sr">↑ 3 status changes</div></div>
+              <div class="kpi"><div class="kpi-l">Programme WAM</div><div class="kpi-v">71.4</div><div class="kpi-s sg">Good Standing</div></div>
+              <div class="kpi"><div class="kpi-l">Potential Grads</div><div class="kpi-v">24</div><div class="kpi-s sa">≤ 18 CP remaining</div></div>
+            </div>
+            <div class="slide-grid">
+              <div class="sg-block"><div class="sg-title">WAM Trend — 8 Weeks</div><div class="bars"><div class="bar bl" style="height:55%"></div><div class="bar bm" style="height:62%"></div><div class="bar bl" style="height:48%"></div><div class="bar bm" style="height:70%"></div><div class="bar bh" style="height:83%"></div><div class="bar bm" style="height:75%"></div><div class="bar bh" style="height:90%"></div><div class="bar bm" style="height:80%"></div></div></div>
+              <div class="sg-block"><div class="sg-title">Course Bottleneck Analysis</div><div class="bars"><div class="bar bh" style="height:88%"></div><div class="bar bm" style="height:52%"></div><div class="bar bh" style="height:76%"></div><div class="bar bl" style="height:34%"></div><div class="bar bm" style="height:64%"></div><div class="bar bl" style="height:42%"></div></div></div>
+              <div class="mrp-block"><div class="mrp-t">MRP Distribution</div><div class="mrp-item"><div class="mrp-nm">Active</div><div class="mrp-bar"><div class="mrp-fill ml" style="width:76%"></div></div></div><div class="mrp-item"><div class="mrp-nm">Referral</div><div class="mrp-bar"><div class="mrp-fill mm" style="width:42%"></div></div></div><div class="mrp-item"><div class="mrp-nm">Restricted</div><div class="mrp-bar"><div class="mrp-fill mh" style="width:18%"></div></div></div></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 1: Faculty -->
+          <div class="dash-slide">
+            <div class="kpi-row">
+              <div class="kpi"><div class="kpi-l">Enrolled Students</div><div class="kpi-v">86</div><div class="kpi-s sb2">CSIT321 — Spring 25</div></div>
+              <div class="kpi"><div class="kpi-l">Avg Attendance</div><div class="kpi-v">78%</div><div class="kpi-s sa">↓ Below threshold</div></div>
+              <div class="kpi"><div class="kpi-l">At-Risk Students</div><div class="kpi-v">11</div><div class="kpi-s sr">Needs attention</div></div>
+              <div class="kpi"><div class="kpi-l">Pending Excuses</div><div class="kpi-v">4</div><div class="kpi-s sb2">Awaiting review</div></div>
+            </div>
+            <div class="slide-grid">
+              <div class="sg-block"><div class="sg-title">Weekly Attendance %</div><div class="bars"><div class="bar bh" style="height:90%"></div><div class="bar bm" style="height:82%"></div><div class="bar bm" style="height:78%"></div><div class="bar bl" style="height:65%"></div><div class="bar bl" style="height:60%"></div><div class="bar bm" style="height:72%"></div></div></div>
+              <div class="sg-block"><div class="sg-title">Task Mark Trend</div><div class="bars"><div class="bar bh" style="height:85%"></div><div class="bar bm" style="height:70%"></div><div class="bar bl" style="height:55%"></div><div class="bar bl" style="height:48%"></div><div class="bar bm" style="height:62%"></div></div></div>
+              <div class="alerts-block"><div class="al-t">⚡ Course Alerts</div><div class="al-i"><div class="al-d" style="background:#ef4444"></div>3 students below 75% attendance</div><div class="al-i"><div class="al-d" style="background:#f59e0b"></div>2 mark drops flagged — Task 3</div><div class="al-i"><div class="al-d" style="background:#3b82f6"></div>1 ASC counsellor note received</div></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 2: Advisor -->
+          <div class="dash-slide">
+            <div class="kpi-row">
+              <div class="kpi"><div class="kpi-l">Advised Students</div><div class="kpi-v">23</div><div class="kpi-s sb2">Under advisement</div></div>
+              <div class="kpi"><div class="kpi-l">At-Risk (WAM)</div><div class="kpi-v">5</div><div class="kpi-s sr">WAM below 50</div></div>
+              <div class="kpi"><div class="kpi-l">Meetings Scheduled</div><div class="kpi-v">6</div><div class="kpi-s sg">Auto-scheduled via n8n</div></div>
+              <div class="kpi"><div class="kpi-l">Pending Excuses</div><div class="kpi-v">2</div><div class="kpi-s sa">Awaiting review</div></div>
+            </div>
+            <div class="slide-grid">
+              <div class="sg-block"><div class="sg-title">Student WAM Distribution</div><div class="bars"><div class="bar bh" style="height:92%"></div><div class="bar bh" style="height:85%"></div><div class="bar bm" style="height:70%"></div><div class="bar bm" style="height:58%"></div><div class="bar bl" style="height:42%"></div><div class="bar bl" style="height:28%"></div></div></div>
+              <div class="fv-schedule"><div class="fv-sch-t">📅 Upcoming Meetings</div><div class="fv-sch-item"><span>Ahmed K. — Wed 2pm</span><span class="fv-badge fv-pend">Pending</span></div><div class="fv-sch-item"><span>Sara M. — Thu 11am</span><span class="fv-badge fv-done">Confirmed</span></div><div class="fv-sch-item"><span>Riya P. — Fri 3pm</span><span class="fv-badge fv-done">Confirmed</span></div></div>
+              <div class="mrp-block"><div class="mrp-t">MRP Status — My Students</div><div class="mrp-item"><div class="mrp-nm">Active</div><div class="mrp-bar"><div class="mrp-fill ml" style="width:78%"></div></div></div><div class="mrp-item"><div class="mrp-nm">Referral</div><div class="mrp-bar"><div class="mrp-fill mm" style="width:35%"></div></div></div><div class="mrp-item"><div class="mrp-nm">Restricted</div><div class="mrp-bar"><div class="mrp-fill mh" style="width:14%"></div></div></div></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 3: ASC -->
+          <div class="dash-slide">
+            <div class="kpi-row">
+              <div class="kpi"><div class="kpi-l">Total Students</div><div class="kpi-v">342</div><div class="kpi-s sb2">All enrolled</div></div>
+              <div class="kpi"><div class="kpi-l">Active Alerts</div><div class="kpi-v">31</div><div class="kpi-s sr">Across all students</div></div>
+              <div class="kpi"><div class="kpi-l">Counsellor Notes</div><div class="kpi-v">8</div><div class="kpi-s sa">Active this trimester</div></div>
+              <div class="kpi"><div class="kpi-l">Reassigned Excuses</div><div class="kpi-v">3</div><div class="kpi-s sb2">Pending ASC review</div></div>
+            </div>
+            <div class="slide-grid">
+              <div class="sg-block"><div class="sg-title">Quota Forecast — Top Subjects</div><div class="bars"><div class="bar bh" style="height:95%"></div><div class="bar bh" style="height:88%"></div><div class="bar bm" style="height:72%"></div><div class="bar bm" style="height:65%"></div><div class="bar bl" style="height:45%"></div></div></div>
+              <div class="alerts-block"><div class="al-t">🗒 Counsellor Notes</div><div class="al-i"><div class="al-d" style="background:#3b82f6"></div>Ahmed K. — Accessibility note sent to Prof. Ibrahim</div><div class="al-i"><div class="al-d" style="background:#3b82f6"></div>Sara M. — Extended time approved</div><div class="al-i"><div class="al-d" style="background:#22c55e"></div>3 notes acknowledged by faculty</div></div>
+              <div class="mrp-block"><div class="mrp-t">Potential Graduates</div><div class="mrp-item"><div class="mrp-nm">This Trimester</div><div class="mrp-bar"><div class="mrp-fill ml" style="width:70%"></div></div></div><div class="mrp-item"><div class="mrp-nm">Next Trimester</div><div class="mrp-bar"><div class="mrp-fill mm" style="width:55%"></div></div></div><div class="mrp-item"><div class="mrp-nm">Following</div><div class="mrp-bar"><div class="mrp-fill ml" style="width:40%"></div></div></div></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 4: Student -->
+          <div class="dash-slide">
+            <div class="kpi-row">
+              <div class="kpi"><div class="kpi-l">MRP Status</div><div class="kpi-v" style="font-size:1.2rem;padding-top:3px">Active</div><div class="kpi-s sg">CP Completion ≥ 66%</div></div>
+              <div class="kpi"><div class="kpi-l">WAM</div><div class="kpi-v">72.4</div><div class="kpi-s sg">Good Standing</div></div>
+              <div class="kpi"><div class="kpi-l">Attendance</div><div class="kpi-v">84%</div><div class="kpi-s sa">↓ Near threshold</div></div>
+              <div class="kpi"><div class="kpi-l">CP Remaining</div><div class="kpi-v">48</div><div class="kpi-s sb2">4 subjects approx.</div></div>
+            </div>
+            <div class="slide-grid">
+              <div class="sg-block"><div class="sg-title">Task Mark Trend</div><div class="bars"><div class="bar bh" style="height:78%"></div><div class="bar bh" style="height:82%"></div><div class="bar bm" style="height:65%"></div><div class="bar bm" style="height:70%"></div><div class="bar bl" style="height:55%"></div></div></div>
+              <div class="fv-schedule"><div class="fv-sch-t">📚 Recommended Subjects</div><div class="fv-sch-item"><span>CSIT321 — Capstone</span><span class="fv-badge fv-done">Priority</span></div><div class="fv-sch-item"><span>CSIT214 — Networks</span><span class="fv-badge fv-done">Eligible</span></div><div class="fv-sch-item"><span>CSIT315 — AI Systems</span><span class="fv-badge fv-pend">Elective</span></div></div>
+              <div class="alerts-block"><div class="al-t">🔔 My Alerts</div><div class="al-i"><div class="al-d" style="background:#f59e0b"></div>Attendance at 84% — threshold is 75%</div><div class="al-i"><div class="al-d" style="background:#22c55e"></div>Advisor meeting confirmed — Thu 11am</div><div class="al-i"><div class="al-d" style="background:#3b82f6"></div>Subject recommendation email sent</div></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 5: Screenshots placeholder -->
+          <div class="dash-slide">
+            <div class="ph-slide" style="min-height:220px;background:rgba(255,255,255,.03);border-radius:12px;border:1px dashed rgba(255,255,255,.15)">
+              <div style="font-size:2.5rem;opacity:.3">🖼</div>
+              <p style="color:rgba(255,255,255,.35);font-size:.88rem;font-style:italic;text-align:center;max-width:320px">System screenshots will appear here.<br/>Upload your images to populate this section.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="dash-nav-dots" id="dnav">
+        <div class="dnd on" onclick="goslide(0,null)"></div>
+        <div class="dnd" onclick="goslide(1,null)"></div>
+        <div class="dnd" onclick="goslide(2,null)"></div>
+        <div class="dnd" onclick="goslide(3,null)"></div>
+        <div class="dnd" onclick="goslide(4,null)"></div>
+        <div class="dnd" onclick="goslide(5,null)"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<div class="trust">
+  <div class="trust-in">
+    <p>Built for institutions that demand data-driven academic governance</p>
+    <div class="trust-row">
+      <div class="trust-i">University of Wollongong Dubai</div>
+      <div class="trust-i">QuadCore</div>
+      <div class="trust-i">n8n Agentic Workflows</div>
+      <div class="trust-i">Groq AI</div>
+      <div class="trust-i">Supabase + Prisma</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="sec how-sec" id="how">
+  <div class="sec-in">
+    <div class="pill pd anim">How It Works</div>
+    <h2 class="sh sw s3d">From Raw Data to Automated Action</h2>
+    <p class="sp2 spw anim">AISAA's four-stage intelligence pipeline transforms disconnected academic data into coordinated, automated institutional support — without manual effort.</p>
+    <div class="how-grid">
+      <div class="how-card anim"><div class="how-num">01</div><h3>Ingest &amp; Centralise</h3><p>Academic records, grades, attendance, and enrolment data flow from the university SIS into AISAA's Supabase data layer via scheduled secure exports.</p></div>
+      <div class="how-card anim" style="transition-delay:.07s"><div class="how-num">02</div><h3>Classify &amp; Detect</h3><p>The deterministic Risk Evaluation Engine calculates MRP status, WAM, task mark trends, and attendance thresholds for every student — updated as data changes.</p></div>
+      <div class="how-card anim" style="transition-delay:.14s"><div class="how-num">03</div><h3>Alert &amp; Escalate</h3><p>When any threshold is breached, targeted alerts are dispatched to the relevant stakeholder — student, faculty, advisor, or ASC — with the specific issue identified.</p></div>
+      <div class="how-card anim" style="transition-delay:.21s"><div class="how-num">04</div><h3>Automate &amp; Resolve</h3><p>The n8n agentic workflow engine autonomously schedules advisor meetings, syncs calendars, sends reminders, and dispatches bulk recommendation emails.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- STAKEHOLDERS -->
+<section class="sec stake-sec" id="stakeholders">
+  <div class="sec-in">
+    <div class="pill pl anim">Five Stakeholder Roles</div>
+    <h2 class="sh sd s3d">One Platform. Every Role Served.</h2>
+    <p class="sp2 anim">AISAA delivers tailored, access-controlled dashboards for each of the five institutional roles — each seeing only what is relevant and authorised for their function.</p>
+    <div class="stake-grid">
+      <div class="stake-card anim">
+        <div class="stake-top st-n">
+          <div class="stake-role">Role 01 — Institutional Leadership</div>
+          <h3>Head of Departments</h3>
+          <p>Programme-level analytics and governance intelligence across all students, courses, and academic trends.</p>
+        </div>
+        <div class="stake-features">
+          <div class="sf-i"><span class="sf-a">→</span>Course analysis and bottleneck detection with fail rate flags</div>
+          <div class="sf-i"><span class="sf-a">→</span>MRP and WAM distribution monitoring across the full programme</div>
+          <div class="sf-i"><span class="sf-a">→</span>Top graduate rankings per course and academic year</div>
+          <div class="sf-i"><span class="sf-a">→</span>Quota forecast based on aggregated student recommendations</div>
+          <div class="sf-i"><span class="sf-a">→</span>Potential graduate identification (CP ≤ 18)</div>
+        </div>
+      </div>
+      <div class="stake-card anim" style="transition-delay:.06s">
+        <div class="stake-top st-b">
+          <div class="stake-role">Role 02 — Academic Advising</div>
+          <h3>Advisor</h3>
+          <p>Comprehensive oversight of assigned students with automated meeting scheduling and intervention tracking.</p>
+        </div>
+        <div class="stake-features">
+          <div class="sf-i"><span class="sf-a">→</span>Advised student list with WAM, MRP, attendance, and alert counts</div>
+          <div class="sf-i"><span class="sf-a">→</span>Automated meeting scheduling via n8n with calendar conflict resolution</div>
+          <div class="sf-i"><span class="sf-a">→</span>Full student profile with performance, degree progress, and recommendations</div>
+          <div class="sf-i"><span class="sf-a">→</span>Excuse request review — approve, reject, or reassign to ASC</div>
+          <div class="sf-i"><span class="sf-a">→</span>Accessibility notes from ASC visible in each student's profile</div>
+        </div>
+      </div>
+      <div class="stake-card anim" style="transition-delay:.12s">
+        <div class="stake-top st-t">
+          <div class="stake-role">Role 03 — Course Delivery</div>
+          <h3>Faculty</h3>
+          <p>Course-level performance monitoring, attendance management, and direct access to student support intelligence.</p>
+        </div>
+        <div class="stake-features">
+          <div class="sf-i"><span class="sf-a">→</span>Attendance recording and per-student absence tracking per course</div>
+          <div class="sf-i"><span class="sf-a">→</span>At-risk student alerts with task mark trend analysis</div>
+          <div class="sf-i"><span class="sf-a">→</span>Excuse management — approve, reject, or reassign to Advisor</div>
+          <div class="sf-i"><span class="sf-a">→</span>Counsellor notes and accessibility requirements from ASC</div>
+          <div class="sf-i"><span class="sf-a">→</span>Course analytics with weekly attendance graphs and student lookup</div>
+        </div>
+      </div>
+      <div class="stake-card anim" style="transition-delay:.18s">
+        <div class="stake-top st-p">
+          <div class="stake-role">Role 04 — Student Support Services</div>
+          <h3>Academic Success Centre</h3>
+          <p>Centralised student welfare management, counsellor documentation, and support resource allocation.</p>
+        </div>
+        <div class="stake-features">
+          <div class="sf-i"><span class="sf-a">→</span>Counsellor notes creation and delivery to relevant faculty</div>
+          <div class="sf-i"><span class="sf-a">→</span>Reassigned excuse request review and final resolution</div>
+          <div class="sf-i"><span class="sf-a">→</span>At-risk student monitoring across all enrolled students</div>
+          <div class="sf-i"><span class="sf-a">→</span>Quota forecast and potential graduate tracking</div>
+          <div class="sf-i"><span class="sf-a">→</span>Data export in PDF, Excel, and CSV for governance reporting</div>
+        </div>
+      </div>
+      <div class="stake-card anim" style="transition-delay:.24s">
+        <div class="stake-top st-g">
+          <div class="stake-role">Role 05 — Academic Journey</div>
+          <h3>Student</h3>
+          <p>A personalised academic intelligence dashboard that keeps students informed, proactive, and on track for graduation.</p>
+        </div>
+        <div class="stake-features">
+          <div class="sf-i"><span class="sf-a">→</span>Real-time dashboard showing MRP status, WAM, attendance, and task marks</div>
+          <div class="sf-i"><span class="sf-a">→</span>Visual Degree Planner with year-by-year CP tracking and prerequisites</div>
+          <div class="sf-i"><span class="sf-a">→</span>Subject recommendations (2–4 subjects) with graduation timeline</div>
+          <div class="sf-i"><span class="sf-a">→</span>Elective eligibility checker based on completed CP and prerequisites</div>
+          <div class="sf-i"><span class="sf-a">→</span>Excuse submission, meeting alerts, and FAQ Chatbot via Groq AI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES — INTERACTIVE TABS -->
+<section class="sec feat-sec" id="features">
+  <div class="sec-in">
+    <div class="pill pd anim">Platform Capabilities</div>
+    <h2 class="sh sw s3d">Intelligent by Design. Automated by Default.</h2>
+    <p class="sp2 spw anim">Every capability in AISAA is built around one principle: the right information reaches the right person at the right time, without manual effort.</p>
+
+    <div class="feat-tabs anim">
+      <button class="ft-btn on" onclick="sfeat(0,this)">Risk Engine</button>
+      <button class="ft-btn" onclick="sfeat(1,this)">Agentic Workflows</button>
+      <button class="ft-btn" onclick="sfeat(2,this)">Degree Planning</button>
+      <button class="ft-btn" onclick="sfeat(3,this)">FAQ Chatbot</button>
+      <button class="ft-btn" onclick="sfeat(4,this)">Excuse Management</button>
+      <button class="ft-btn" onclick="sfeat(5,this)">Course Analytics</button>
+    </div>
+
+    <!-- Panel 0: Risk Engine -->
+    <div class="feat-panel on" id="fp0">
+      <div class="fp-text">
+        <h3>Deterministic Risk Classification Engine</h3>
+        <p>AISAA's Risk Evaluation Engine applies fixed, university-defined threshold rules to classify every student's academic standing — no machine learning, no guesswork, fully auditable.</p>
+        <div class="fp-points">
+          <div class="fp-pt"><div class="fp-pt-dot"></div>MRP classified as Active (≥66%), Referral (50–65%), Restricted (&lt;50%), or Excluded per policy</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>WAM calculated as weighted average of subject marks with classification bands and alert thresholds</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Task mark trends evaluated for sharp drops, consecutive declines, and performance below course average</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Attendance threshold checks per course with automated absence alerts</div>
+        </div>
+        <span class="fp-tag">Python · Supabase · Deterministic Rules</span>
+      </div>
+      <div class="fp-visual">
+        <div class="fv-row">
+          <div class="fv-pill"><div class="fv-label">MRP Status</div><div class="fv-val" style="font-size:1.1rem">Referral</div><div class="fv-sub" style="color:#f59e0b">50–65% CP Rate</div></div>
+          <div class="fv-pill"><div class="fv-label">WAM</div><div class="fv-val">58.2</div><div class="fv-sub" style="color:#f59e0b">↓ Satisfactory</div></div>
+        </div>
+        <div class="fv-bar-row">
+          <div class="fv-br-label">Risk Area Breakdown</div>
+          <div class="fv-br-item"><div class="fv-br-name">MRP</div><div class="fv-br-track"><div class="fv-br-fill" style="width:65%;background:#f59e0b"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">WAM</div><div class="fv-br-track"><div class="fv-br-fill" style="width:58%;background:#f59e0b"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">Attendance</div><div class="fv-br-track"><div class="fv-br-fill" style="width:82%;background:#22c55e"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">Task Marks</div><div class="fv-br-track"><div class="fv-br-fill" style="width:44%;background:#ef4444"></div></div></div>
+        </div>
+        <div class="fv-alert">
+          <div class="fv-alert-t">Alert Generated</div>
+          <div class="fv-alert-i"><div class="fv-alert-d" style="background:#ef4444"></div>Task marks dropped 18 points between Assessment 2 and Assessment 3</div>
+          <div class="fv-alert-i"><div class="fv-alert-d" style="background:#f59e0b"></div>MRP status changed from Active to Referral — advisor notified</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 1: Agentic -->
+    <div class="feat-panel" id="fp1">
+      <div class="fp-text">
+        <h3>n8n Agentic Workflow Automation</h3>
+        <p>When a student is flagged, AISAA's n8n-powered agentic layer takes over — autonomously scheduling meetings, dispatching emails, updating calendars, and sending reminders without any human intervention.</p>
+        <div class="fp-points">
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Reads advisor calendar availability and proposes suitable meeting slots</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Handles scheduling conflicts by automatically proposing the next available slot</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Creates calendar events for both student and advisor on confirmation</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Dispatches bulk personalised subject recommendation emails to all students simultaneously</div>
+        </div>
+        <span class="fp-tag">n8n · NodeMailer · Calendar API</span>
+      </div>
+      <div class="fp-visual">
+        <div class="fv-schedule">
+          <div class="fv-sch-t">📅 Auto-Scheduled Meetings — This Week</div>
+          <div class="fv-sch-item"><span>Ahmed K. · Advisor: Dr. Rafi</span><span class="fv-badge fv-done">Confirmed</span></div>
+          <div class="fv-sch-item"><span>Sara M. · Advisor: Dr. Rafi</span><span class="fv-badge fv-done">Confirmed</span></div>
+          <div class="fv-sch-item"><span>James L. · Advisor: Dr. Rafi</span><span class="fv-badge fv-pend">Proposed</span></div>
+          <div class="fv-sch-item"><span>Riya P. · Advisor: Dr. Rafi</span><span class="fv-badge fv-pend">Conflict — Rescheduling</span></div>
+        </div>
+        <div class="fv-alert">
+          <div class="fv-alert-t">Workflow Log</div>
+          <div class="fv-alert-i"><div class="fv-alert-d" style="background:#22c55e"></div>Alert email sent to student and advisor — 2.3s</div>
+          <div class="fv-alert-i"><div class="fv-alert-d" style="background:#22c55e"></div>Meeting proposal dispatched — advisor calendar checked</div>
+          <div class="fv-alert-i"><div class="fv-alert-d" style="background:#3b82f6"></div>Reminder scheduled — 24h before meeting time</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: Degree Planning -->
+    <div class="feat-panel" id="fp2">
+      <div class="fp-text">
+        <h3>Degree Planner &amp; Subject Recommendations</h3>
+        <p>Students get a visual year-by-year map of their entire degree programme. The recommendation engine uses deterministic priority scoring to suggest the optimal 2–4 subjects for next trimester.</p>
+        <div class="fp-points">
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Colour-coded degree planner: Completed (green), In Progress (yellow), Remaining (grey)</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>CP progress tracker with estimated trimesters to graduation</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Prerequisite validation — ineligible subjects automatically filtered out</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Elective eligibility checker based on completed CP and programme rules</div>
+        </div>
+        <span class="fp-tag">Python · Supabase · Priority Scoring</span>
+      </div>
+      <div class="fp-visual">
+        <div class="fv-row">
+          <div class="fv-pill"><div class="fv-label">CP Completed</div><div class="fv-val">96</div><div class="fv-sub" style="color:#22c55e">67% of degree</div></div>
+          <div class="fv-pill"><div class="fv-label">CP Remaining</div><div class="fv-val">48</div><div class="fv-sub" style="color:#3b82f6">~4 subjects</div></div>
+        </div>
+        <div class="fv-schedule">
+          <div class="fv-sch-t">📚 Recommended — Next Trimester</div>
+          <div class="fv-sch-item"><span>CSIT321 · Capstone · 8CP</span><span class="fv-badge fv-done">Required</span></div>
+          <div class="fv-sch-item"><span>CSIT214 · Networks · 8CP</span><span class="fv-badge fv-done">Prerequisite Met</span></div>
+          <div class="fv-sch-item"><span>CSIT315 · AI Systems · 8CP</span><span class="fv-badge fv-pend">Elective</span></div>
+        </div>
+        <div class="fv-bar-row">
+          <div class="fv-br-label">Degree Progress</div>
+          <div class="fv-br-item"><div class="fv-br-name">Year 1</div><div class="fv-br-track"><div class="fv-br-fill" style="width:100%;background:#22c55e"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">Year 2</div><div class="fv-br-track"><div class="fv-br-fill" style="width:100%;background:#22c55e"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">Year 3</div><div class="fv-br-track"><div class="fv-br-fill" style="width:65%;background:#f59e0b"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 3: Chatbot -->
+    <div class="feat-panel" id="fp3">
+      <div class="fp-text">
+        <h3>Groq-Powered FAQ Chatbot</h3>
+        <p>A RAG-based chatbot trained on uploaded university policy PDFs — answering natural language queries about attendance rules, graduation requirements, and institutional procedures for all five user roles.</p>
+        <div class="fp-points">
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Retrieval-Augmented Generation over uploaded policy documents</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Requests clarification on ambiguous queries rather than guessing</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Responds with "not found in knowledge base" for out-of-scope questions</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Responds within 3-second SLA — accessible to all five user roles</div>
+        </div>
+        <span class="fp-tag">Groq API · RAG · Policy PDFs</span>
+      </div>
+      <div class="fp-visual">
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;flex:1">
+          <div style="font-size:.63rem;color:rgba(255,255,255,.35);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">FAQ Chatbot — Live Preview</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:rgba(255,255,255,.07);border-radius:8px 8px 8px 2px;padding:9px 12px;font-size:.74rem;color:rgba(255,255,255,.75);max-width:85%">What is the minimum attendance requirement?</div>
+            <div style="background:rgba(34,104,232,.2);border:1px solid rgba(34,104,232,.3);border-radius:8px 8px 2px 8px;padding:9px 12px;font-size:.74rem;color:rgba(255,255,255,.85);max-width:90%;align-self:flex-end">The minimum attendance requirement is <b>75%</b> per subject per trimester. Students who fall below this threshold will receive an automated absence alert.</div>
+            <div style="background:rgba(255,255,255,.07);border-radius:8px 8px 8px 2px;padding:9px 12px;font-size:.74rem;color:rgba(255,255,255,.75);max-width:85%">How many subjects do I need to graduate?</div>
+            <div style="background:rgba(34,104,232,.2);border:1px solid rgba(34,104,232,.3);border-radius:8px 8px 2px 8px;padding:9px 12px;font-size:.74rem;color:rgba(255,255,255,.85);max-width:90%;align-self:flex-end">Based on your degree programme, you require <b>144 credit points</b> in total. You currently have 96 CP completed.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Excuse Management -->
+    <div class="feat-panel" id="fp4">
+      <div class="fp-text">
+        <h3>Excuse Lifecycle Management</h3>
+        <p>A structured digital workflow for excuse requests that removes email chains and manual tracking — from student submission to final resolution across three levels of review.</p>
+        <div class="fp-points">
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Students submit excuse requests with subject, date, reason, and optional file upload</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Faculty review first — can approve, reject, or reassign to Advisor</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Advisor reviews reassigned requests — can approve, reject, or reassign to ASC</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Attendance records update automatically when a request is approved</div>
+        </div>
+        <span class="fp-tag">Multi-Role · Automated · Audit Logged</span>
+      </div>
+      <div class="fp-visual">
+        <div class="fv-schedule">
+          <div class="fv-sch-t">📋 Excuse Requests — Current</div>
+          <div class="fv-sch-item"><span>Ahmed K. · CSIT321 · Week 6</span><span class="fv-badge fv-pend">Pending Faculty</span></div>
+          <div class="fv-sch-item"><span>Sara M. · CSIT214 · Week 5</span><span class="fv-badge fv-done">Approved</span></div>
+          <div class="fv-sch-item"><span>James L. · CSIT315 · Week 4</span><span class="fv-badge" style="background:rgba(109,58,181,.2);color:#a78bfa">Reassigned → ASC</span></div>
+          <div class="fv-sch-item"><span>Riya P. · CSIT321 · Week 6</span><span class="fv-badge" style="background:rgba(239,68,68,.15);color:#ef4444">Rejected</span></div>
+        </div>
+        <div class="fv-bar-row">
+          <div class="fv-br-label">Excuse Resolution Rate</div>
+          <div class="fv-br-item"><div class="fv-br-name">Approved</div><div class="fv-br-track"><div class="fv-br-fill" style="width:62%;background:#22c55e"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">Rejected</div><div class="fv-br-track"><div class="fv-br-fill" style="width:22%;background:#ef4444"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">Pending</div><div class="fv-br-track"><div class="fv-br-fill" style="width:16%;background:#f59e0b"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 5: Course Analytics -->
+    <div class="feat-panel" id="fp5">
+      <div class="fp-text">
+        <h3>Course Analytics &amp; Quota Forecasting</h3>
+        <p>The Head of Departments dashboard surfaces programme-level intelligence — identifying underperforming courses, predicting enrolment demand, and ranking top graduates before results are finalised.</p>
+        <div class="fp-points">
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Bottleneck detection flags courses where fail rate exceeds defined thresholds</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Pass rate, average mark, and fail rate calculated per course each trimester</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Quota forecast aggregates recommendation demand across all students to predict subject enrolment</div>
+          <div class="fp-pt"><div class="fp-pt-dot"></div>Top graduate rankings by WAM per course and academic year</div>
+        </div>
+        <span class="fp-tag">HoD Dashboard · Python · Analytics Engine</span>
+      </div>
+      <div class="fp-visual">
+        <div class="fv-bar-row">
+          <div class="fv-br-label">Course Performance — Fail Rate</div>
+          <div class="fv-br-item"><div class="fv-br-name">CSIT251</div><div class="fv-br-track"><div class="fv-br-fill" style="width:78%;background:#ef4444"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">CSIT321</div><div class="fv-br-track"><div class="fv-br-fill" style="width:22%;background:#22c55e"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">CSIT214</div><div class="fv-br-track"><div class="fv-br-fill" style="width:45%;background:#f59e0b"></div></div></div>
+          <div class="fv-br-item"><div class="fv-br-name">CSIT315</div><div class="fv-br-track"><div class="fv-br-fill" style="width:18%;background:#22c55e"></div></div></div>
+        </div>
+        <div class="fv-alert">
+          <div class="fv-alert-t">🚨 Bottleneck Detected</div>
+          <div class="fv-alert-i"><div class="fv-alert-d" style="background:#ef4444"></div>CSIT251 — 38% fail rate (threshold: 25%). Flagged as High Priority Bottleneck.</div>
+          <div class="fv-alert-i"><div class="fv-alert-d" style="background:#f59e0b"></div>CSIT214 — 20% fail rate. Moderate concern — monitoring.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="sec team-sec" id="team">
+  <div class="sec-in">
+    <div class="pill pl anim">Meet the Team</div>
+    <h2 class="sh sd s3d">Built by QuadCore</h2>
+    <p class="sp2 anim">AISAA was designed, developed, and delivered by a multidisciplinary team at the University of Wollongong in Dubai — combining AI engineering, full-stack development, agentic automation, product design, and rigorous documentation.</p>
+    <div class="team-grid">
+
+      <div class="tc anim">
+        <div class="tc-top">
+          <div class="tc-photo"><img src="" alt="GR" onerror="this.parentElement.textContent='GR'"/></div>
+          <div class="tc-name">Guzail Rafi</div>
+          <div class="tc-role">Team Lead — Agentic Workflows</div>
+        </div>
+        <div class="tc-bot">
+          <div class="tc-resp">Overall technical leadership and design and implementation of all n8n agentic workflows — alert dispatch, meeting scheduling, calendar integration, conflict resolution, and bulk email.</div>
+          <div class="tc-tags"><span class="tc-tag">Team Lead</span><span class="tc-tag">n8n</span><span class="tc-tag">Workflow Automation</span></div>
+        </div>
+      </div>
+
+      <div class="tc anim" style="transition-delay:.06s">
+        <div class="tc-top">
+          <div class="tc-photo"><img src="" alt="KV" onerror="this.parentElement.textContent='KV'"/></div>
+          <div class="tc-name">Kavya Vinod</div>
+          <div class="tc-role">Scribe &amp; Project Coordinator</div>
+        </div>
+        <div class="tc-bot">
+          <div class="tc-resp">Project coordination, milestone tracking, meeting facilitation, minute-taking, documentation quality assurance, and supervisor liaison throughout both trimesters.</div>
+          <div class="tc-tags"><span class="tc-tag">Scribe</span><span class="tc-tag">Coordination</span><span class="tc-tag">Documentation</span></div>
+        </div>
+      </div>
+
+      <div class="tc anim" style="transition-delay:.12s">
+        <div class="tc-top">
+          <div class="tc-photo"><img src="" alt="AD" onerror="this.parentElement.textContent='AD'"/></div>
+          <div class="tc-name">Aryan Dewan</div>
+          <div class="tc-role">Programmer — Auth &amp; Chatbot</div>
+        </div>
+        <div class="tc-bot">
+          <div class="tc-resp">Full-stack programming for Microsoft Authenticator MFA integration, RBAC enforcement, and the Groq-powered FAQ Chatbot with RAG-based knowledge retrieval from policy PDFs.</div>
+          <div class="tc-tags"><span class="tc-tag">Programmer</span><span class="tc-tag">Auth</span><span class="tc-tag">Groq AI</span></div>
+        </div>
+      </div>
+
+      <div class="tc anim" style="transition-delay:.18s">
+        <div class="tc-top">
+          <div class="tc-photo"><img src="" alt="FZ" onerror="this.parentElement.textContent='FZ'"/></div>
+          <div class="tc-name">Faraaz Zuberi</div>
+          <div class="tc-role">Programmer — Data &amp; Alerts</div>
+        </div>
+        <div class="tc-bot">
+          <div class="tc-resp">Full-stack programming for bulk email dispatch, academic alert generation, data export functionality (PDF, Excel, CSV), Supabase integration, and backend data pipeline management.</div>
+          <div class="tc-tags"><span class="tc-tag">Programmer</span><span class="tc-tag">Backend</span><span class="tc-tag">Supabase</span></div>
+        </div>
+      </div>
+
+      <div class="tc anim" style="transition-delay:.24s">
+        <div class="tc-top">
+          <div class="tc-photo"><img src="" alt="MI" onerror="this.parentElement.textContent='MI'"/></div>
+          <div class="tc-name">Mohamad Itani</div>
+          <div class="tc-role">Marketing &amp; Design</div>
+        </div>
+        <div class="tc-bot">
+          <div class="tc-resp">System marketing, UI/UX design in Figma for all five role-specific dashboards, React frontend implementation, visual components, and brand identity for AISAA.</div>
+          <div class="tc-tags"><span class="tc-tag">Marketing</span><span class="tc-tag">React.js</span><span class="tc-tag">Figma</span></div>
+        </div>
+      </div>
+
+      <div class="tc anim" style="transition-delay:.30s">
+        <div class="tc-top">
+          <div class="tc-photo"><img src="" alt="VV" onerror="this.parentElement.textContent='VV'"/></div>
+          <div class="tc-name">Vyshnav Vinod</div>
+          <div class="tc-role">Documentation &amp; UI</div>
+        </div>
+        <div class="tc-bot">
+          <div class="tc-resp">All project deliverables, requirements documentation, system testing records, test data strategy, UI implementation support, and QA across functional, integration, and UAT cycles.</div>
+          <div class="tc-tags"><span class="tc-tag">Documentation</span><span class="tc-tag">UI</span><span class="tc-tag">Testing</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="sec reviews-sec" id="reviews">
+  <div class="sec-in">
+    <div class="pill pl anim">Reviews</div>
+    <h2 class="sh sd s3d">What Stakeholders Are Saying</h2>
+    <p class="sp2 anim">Feedback from faculty, advisors, and institutional leadership who have experienced AISAA firsthand. Reviews will be updated as more responses are collected.</p>
+    <div class="reviews-grid">
+      <div class="rv anim">
+        <div class="rv-stars"><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span></div>
+        <div class="rv-placeholder full"></div>
+        <div class="rv-placeholder medium"></div>
+        <div class="rv-placeholder full"></div>
+        <div class="rv-placeholder short"></div>
+        <div class="rv-author"><div class="rv-avatar"></div><div><div class="rv-name-ph"></div><div class="rv-role-ph"></div></div></div>
+        <div class="rv-coming"><div class="rv-coming-icon">💬</div><p>Review coming soon</p></div>
+      </div>
+      <div class="rv anim" style="transition-delay:.08s">
+        <div class="rv-stars"><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span></div>
+        <div class="rv-placeholder full"></div>
+        <div class="rv-placeholder medium"></div>
+        <div class="rv-placeholder full"></div>
+        <div class="rv-placeholder short"></div>
+        <div class="rv-author"><div class="rv-avatar"></div><div><div class="rv-name-ph"></div><div class="rv-role-ph"></div></div></div>
+        <div class="rv-coming"><div class="rv-coming-icon">💬</div><p>Review coming soon</p></div>
+      </div>
+      <div class="rv anim" style="transition-delay:.16s">
+        <div class="rv-stars"><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span><span class="rv-star">★</span></div>
+        <div class="rv-placeholder full"></div>
+        <div class="rv-placeholder medium"></div>
+        <div class="rv-placeholder full"></div>
+        <div class="rv-placeholder short"></div>
+        <div class="rv-author"><div class="rv-avatar"></div><div><div class="rv-name-ph"></div><div class="rv-role-ph"></div></div></div>
+        <div class="rv-coming"><div class="rv-coming-icon">💬</div><p>Review coming soon</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="sec about-sec" id="about">
+  <div class="sec-in">
+    <div class="pill pl anim">About Us</div>
+    <h2 class="sh sd s3d">Built by QuadCore, for Institutions That Care</h2>
+    <div class="about-grid">
+      <div class="about-visual slide-in-l">
+        <div class="about-img-wrap">
+          <img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efd?w=800&q=80" alt="QuadCore Team"/>
+        </div>
+        <div class="about-badge">Based in <b>Dubai, UAE</b></div>
+      </div>
+      <div class="slide-in-r">
+        <h2 class="about-text-h">Transforming Academic Management Through Intelligent Automation</h2>
+        <p class="about-p">QuadCore is a technology team specialising in AI-driven solutions for the higher education sector. AISAA was built to address a fundamental gap in institutional academic management: the delay between when students begin to struggle and when institutions respond.</p>
+        <p class="about-p">The platform combines a deterministic risk evaluation engine, an n8n-powered agentic automation layer, a Groq-powered FAQ chatbot, and a unified multi-role web interface — delivering a complete academic intelligence ecosystem built entirely on open-source and free-tier tools.</p>
+        <p class="about-p">Developed as a capstone project at the University of Wollongong in Dubai, AISAA is designed to be immediately deployable at institutional scale with no licensing fees and no dependency on paid ML infrastructure.</p>
+        <div class="mv-row">
+          <div class="mvc mvc-m"><div class="mvc-i">🎯</div><h3>Our Mission</h3><p>To eliminate preventable academic failure by giving every institution the intelligence and automation needed to act before students reach a critical point of decline.</p></div>
+          <div class="mvc mvc-v"><div class="mvc-i">🔭</div><h3>Our Vision</h3><p>A university ecosystem where every stakeholder — from student to Head of Department — operates with complete, real-time academic intelligence and zero administrative overhead.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="sec contact-sec" id="contact">
+  <div class="sec-in">
+    <div class="pill pd anim">Get In Touch</div>
+    <h2 class="sh sw s3d">Request a Demo or Contact Us</h2>
+    <p class="sp2 spw anim">Interested in deploying AISAA at your institution? Reach out and our team will respond within 24 hours.</p>
+    <div class="contact-grid">
+      <div class="contact-cards">
+        <div class="cc anim"><div class="cc-icon">📧</div><div><h4>Email Us</h4><p>For demos, partnerships, or enquiries:<br/><a href="mailto:aisaaquadcore@gmail.com">aisaaquadcore@gmail.com</a></p></div></div>
+        <div class="cc anim" style="transition-delay:.07s"><div class="cc-icon">📍</div><div><h4>Our Location</h4><p>Dubai, United Arab Emirates<br/>Available for on-site demos across the UAE</p></div></div>
+        <div class="cc anim" style="transition-delay:.14s"><div class="cc-icon">📸</div><div><h4>Follow on Instagram</h4><p>Latest updates and news:<br/><a href="https://instagram.com/aisaaquadcore" target="_blank">@aisaaquadcore</a></p></div></div>
+        <div class="cc anim" style="transition-delay:.21s"><div class="cc-icon">🏛️</div><div><h4>Institution</h4><p>University of Wollongong in Dubai<br/>Capstone Project — CSIT321</p></div></div>
+      </div>
+      <div class="contact-form anim" style="transition-delay:.1s">
+        <h3>Send Us a Message</h3>
+        <p>Fill in the form below and we'll be in touch shortly.</p>
+        <div class="fg"><label>Your Name *</label><input class="fi" id="f-name" type="text" placeholder="e.g. Dr. Ahmed Al Mansoori"/></div>
+        <div class="fg"><label>Institution / Organisation *</label><input class="fi" id="f-org" type="text" placeholder="e.g. University of Dubai"/></div>
+        <div class="fg"><label>Your Role</label><input class="fi" id="f-role" type="text" placeholder="e.g. Head of School, Academic Advisor, IT Director"/></div>
+        <div class="fg"><label>Email Address *</label><input class="fi" id="f-email" type="email" placeholder="you@institution.edu"/></div>
+        <div class="fg"><label>Message *</label><textarea class="fi" id="f-msg" placeholder="Tell us about your institution and how AISAA could help..."></textarea></div>
+        <button class="fsub" onclick="sendForm()">Send Message →</button>
+        <div id="form-msg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEGAL -->
+<section class="sec legal-sec" id="legal">
+  <div class="sec-in">
+    <div class="pill pl anim">Legal</div>
+    <h2 class="sh sd s3d">Privacy Policy &amp; Terms of Use</h2>
+    <p class="sp2 anim" style="margin-bottom:28px">Last updated: January 2025 · QuadCore, Dubai, UAE</p>
+    <div class="tab-bar anim">
+      <button class="tb on" onclick="stab('priv',this)">🔒 Privacy Policy</button>
+      <button class="tb" onclick="stab('terms',this)">📋 Terms of Use</button>
+    </div>
+    <div class="tp on" id="priv">
+      <div class="legal-grid">
+        <div class="lb anim"><div class="lb-head"><div class="lb-n">1</div><h3>Information We Collect</h3></div><p>AISAA collects academic performance data, attendance records, MRP and WAM metrics, student and staff profile information, communication logs, counsellor notes, meeting records, and calendar data — all provided by partnering institutions through a formal data-sharing agreement.</p></div>
+        <div class="lb anim" style="transition-delay:.05s"><div class="lb-head"><div class="lb-n">2</div><h3>How We Use Your Data</h3></div><p>Data is used exclusively to generate risk classifications, personalised recommendations, automate communication workflows, coordinate advisor meetings, and support institutional analytics. <strong>Personal data is never sold or shared with any third party.</strong></p></div>
+        <div class="lb anim" style="transition-delay:.1s"><div class="lb-head"><div class="lb-n">3</div><h3>Data Security</h3></div><p>All data is encrypted in transit (TLS) and at rest. Microsoft Authenticator MFA is enforced for all user roles. Access is strictly role-based via Supabase Row Level Security. All events are logged with timestamps for audit purposes.</p></div>
+        <div class="lb anim" style="transition-delay:.15s"><div class="lb-head"><div class="lb-n">4</div><h3>Data Retention &amp; Deletion</h3></div><p>Student data is retained only during the active institutional agreement. Upon termination, all data is securely deleted within <strong>30 days</strong> of a written deletion request from the institution.</p></div>
+        <div class="lb anim" style="transition-delay:.2s"><div class="lb-head"><div class="lb-n">5</div><h3>Your Rights</h3></div><p>Institutions may request access to, correction of, or deletion of any data at any time by contacting <strong><a href="mailto:aisaaquadcore@gmail.com">aisaaquadcore@gmail.com</a></strong>. All requests processed within 10 business days in compliance with UAE Federal Data Protection Law (Federal Decree-Law No. 45 of 2021).</p></div>
+        <div class="lb anim" style="transition-delay:.25s"><div class="lb-head"><div class="lb-n">6</div><h3>Contact for Privacy</h3></div><p>Email: <strong><a href="mailto:aisaaquadcore@gmail.com">aisaaquadcore@gmail.com</a></strong><br/>Location: Dubai, United Arab Emirates<br/>Instagram: @aisaaquadcore</p></div>
+      </div>
+    </div>
+    <div class="tp" id="terms">
+      <div class="legal-grid">
+        <div class="lb anim"><div class="lb-head"><div class="lb-n">1</div><h3>Acceptance of Terms</h3></div><p>By accessing or using the AISAA platform in any capacity, you confirm that you have read, understood, and agree to be bound by these Terms of Use. If you do not agree, you must cease use immediately.</p></div>
+        <div class="lb anim" style="transition-delay:.05s"><div class="lb-head"><div class="lb-n">2</div><h3>Permitted Use</h3></div><p>AISAA is licensed exclusively for authorised educational institutions. It may only be used for academic monitoring, student support coordination, advisor communication, institutional analytics, and reporting as defined in your QuadCore agreement.</p></div>
+        <div class="lb anim" style="transition-delay:.1s"><div class="lb-head"><div class="lb-n">3</div><h3>Intellectual Property</h3></div><p>All content, software, workflows, AI configurations, and branding within AISAA are the exclusive intellectual property of <strong>QuadCore</strong>. Unauthorised reproduction, distribution, or reverse engineering is strictly prohibited.</p></div>
+        <div class="lb anim" style="transition-delay:.15s"><div class="lb-head"><div class="lb-n">4</div><h3>Limitation of Liability</h3></div><p>QuadCore provides AISAA on an "as is" basis. All platform insights and risk classifications are decision-support outputs and should be used alongside human professional judgement. QuadCore is not liable for decisions made solely on AISAA outputs.</p></div>
+        <div class="lb anim" style="transition-delay:.2s"><div class="lb-head"><div class="lb-n">5</div><h3>Account Responsibilities</h3></div><p>Institutions must ensure only authorised personnel access the platform, maintain credential confidentiality, promptly report security breaches, and ensure usage complies with all applicable local laws including UAE Federal Data Protection regulations.</p></div>
+        <div class="lb anim" style="transition-delay:.25s"><div class="lb-head"><div class="lb-n">6</div><h3>Governing Law</h3></div><p>These terms are governed by the laws of the <strong>United Arab Emirates</strong>. Any disputes shall be subject to the exclusive jurisdiction of the courts of <strong>Dubai, UAE</strong>. Contact: <a href="mailto:aisaaquadcore@gmail.com">aisaaquadcore@gmail.com</a></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="cta-in">
+    <h2>Academic Institutions Deserve Better Tools.<br/><em style="font-style:italic;color:var(--gold3)">AISAA Is That Tool.</em></h2>
+    <p>Deploy AISAA at your institution and give every stakeholder the intelligence they need to act — before it's too late.</p>
+    <div class="cta-btns">
+      <a href="#contact" class="btn-gold">Request a Demo →</a>
+      <a href="#how" class="btn-outline">See How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft">
+    <div>
+      <div class="fb-logo">AIS<b>AA</b></div>
+      <p class="fb-desc">AI-powered academic intelligence platform serving five institutional stakeholder roles — from student to Head of Department — through deterministic risk classification and fully automated agentic workflows.</p>
+      <div class="fb-pow">⚡ Powered by <b>QuadCore</b></div>
+    </div>
+    <div class="fc2">
+      <h4>Platform</h4>
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+      <a href="#stakeholders">Stakeholder Roles</a>
+      <a href="#contact">Request Demo</a>
+    </div>
+    <div class="fc2">
+      <h4>Company</h4>
+      <a href="#team">Our Team</a>
+      <a href="#about">About QuadCore</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#contact">Contact Us</a>
+      <a href="#legal">Privacy &amp; Terms</a>
+    </div>
+  </div>
+  <div class="fb-bottom">
+    <p>© 2025 QuadCore. All rights reserved. AISAA is a product of QuadCore.</p>
+    <p>Dubai, UAE · aisaaquadcore@gmail.com · @aisaaquadcore</p>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';
+});
+document.querySelectorAll('a,button,.ft-btn,.tb,.dt,.dnd,.stake-card,.tc,.rv').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='translate(-50%,-50%) scale(2.4)';ring.style.width='52px';ring.style.height='52px'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='translate(-50%,-50%) scale(1)';ring.style.width='38px';ring.style.height='38px'});
+});
+
+// SCROLL BAR
+const sb=document.getElementById('sb');
+window.addEventListener('scroll',()=>{sb.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100+'%'});
+
+// SPLASH
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    document.getElementById('nav').classList.add('show');
+  },2800);
+});
+
+// PARTICLES
+const ptc=document.getElementById('ptc');
+for(let i=0;i<22;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const s=Math.random()*2.5+1;
+  p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${Math.random()*14+8}s;animation-delay:${Math.random()*10}s;opacity:${Math.random()*.45+.1}`;
+  ptc.appendChild(p);
+}
+
+// TYPING
+const quotes=[
+  '"Academic management shouldn\'t be manual. AISAA automates it."',
+  '"Raw academic data becomes real institutional intelligence — serving every role, end to end."',
+  '"Five roles. One system. Every student supported. Every stakeholder informed."',
+  '"From MRP classification to advisor meeting — fully automated, end to end."',
+  '"Academic institutions deserve better tools. AISAA is that tool."'
+];
+let qi=0,ci=0,del=false;
+const tel=document.getElementById('qt');
+function type(){
+  const q=quotes[qi];
+  if(!del){tel.textContent=q.slice(0,++ci);if(ci===q.length){del=true;setTimeout(type,2600);return}}
+  else{tel.textContent=q.slice(0,--ci);if(ci===0){del=false;qi=(qi+1)%quotes.length;setTimeout(type,500);return}}
+  setTimeout(type,del?26:50);
+}
+setTimeout(type,3400);
+
+// DASHBOARD SLIDES
+let curSlide=0;
+function goslide(n,btn){
+  curSlide=n;
+  document.getElementById('dslides').style.transform=`translateX(-${n*100}%)`;
+  document.querySelectorAll('.dt').forEach((t,i)=>t.classList.toggle('on',i===n));
+  document.querySelectorAll('.dnd').forEach((d,i)=>d.classList.toggle('on',i===n));
+}
+// Auto advance
+setInterval(()=>{
+  const next=(curSlide+1)%6;
+  goslide(next,null);
+},5000);
+
+// SCROLL ANIMATIONS
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')});
+},{threshold:.08});
+document.querySelectorAll('.anim,.s3d,.slide-in-l,.slide-in-r').forEach(e=>obs.observe(e));
+
+// FEATURE PANELS
+function sfeat(n,btn){
+  for(let i=0;i<6;i++){
+    document.getElementById('fp'+i).classList.toggle('on',i===n);
+  }
+  document.querySelectorAll('.ft-btn').forEach((b,i)=>b.classList.toggle('on',i===n));
+}
+
+// LEGAL TABS
+function stab(id,btn){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  document.querySelectorAll('#'+id+' .anim').forEach(e=>{e.classList.remove('vis');setTimeout(()=>e.classList.add('vis'),60)});
+}
+
+// CONTACT FORM — sends via mailto to aisaaquadcore@gmail.com
+function sendForm(){
+  const name=document.getElementById('f-name').value.trim();
+  const org=document.getElementById('f-org').value.trim();
+  const role=document.getElementById('f-role').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const msg=document.getElementById('f-msg').value.trim();
+  const fmsg=document.getElementById('form-msg');
+  if(!name||!org||!email||!msg){
+    fmsg.className='err';fmsg.style.display='block';
+    fmsg.textContent='Please fill in all required fields (Name, Institution, Email, Message).';
+    return;
+  }
+  const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRegex.test(email)){
+    fmsg.className='err';fmsg.style.display='block';
+    fmsg.textContent='Please enter a valid email address.';
+    return;
+  }
+  const subject=encodeURIComponent('AISAA Demo Request — '+name+' ('+org+')');
+  const body=encodeURIComponent(
+    'Name: '+name+'\n'+
+    'Organisation: '+org+'\n'+
+    'Role: '+(role||'Not specified')+'\n'+
+    'Email: '+email+'\n\n'+
+    'Message:\n'+msg+'\n\n'+
+    '---\nSent via AISAA website contact form'
+  );
+  window.location.href='mailto:aisaaquadcore@gmail.com?subject='+subject+'&body='+body;
+  fmsg.className='ok';fmsg.style.display='block';
+  fmsg.textContent='Opening your email client to send the message to aisaaquadcore@gmail.com';
+}
+</script>
+</body>
+</html>
